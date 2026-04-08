@@ -103,7 +103,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   Future<void> _vibrate(int duration) async {
-    if (await Vibration.hasVibrator() ?? false) {
+    if (await Vibration.hasVibrator()) {
       unawaited(Vibration.vibrate(duration: duration));
     }
   }
