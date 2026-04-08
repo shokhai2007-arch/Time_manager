@@ -1,0 +1,25 @@
+# This file configures the static analysis as described in the
+# Certificate of Excellence in Flutter development.
+# Check https://dart.dev/guides/language/analysis-options
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - always_declare_return_types
+    - cancel_subscriptions
+    - close_sinks
+    - comment_references
+    - one_member_abstracts
+    - only_throw_errors
+    - package_api_docs
+    - prefer_final_locals
+    - test_types_in_equals
+    - throw_in_finally
+    - unawaited_futures
+    - unnecessary_brace_in_string_interps
+    - unnecessary_getters_setters
+    - unnecessary_statements
