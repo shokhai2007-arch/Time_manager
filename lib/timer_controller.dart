@@ -112,11 +112,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
     // Derive period from elapsed total seconds.
     final elapsedSinceStart = _totalAtStart - newTotal;
-    final periodSecondsElapsed = elapsedSinceStart + (state.periodSeconds - _periodAtStart);
-    int newPeriod = state.periodSeconds - (periodSecondsElapsed % state.periodSeconds);
+    final periodSecondsElapsed =
+        elapsedSinceStart + (state.periodSeconds - _periodAtStart);
+    int newPeriod =
+        state.periodSeconds - (periodSecondsElapsed % state.periodSeconds);
 
     // Check if a period boundary was just crossed (vibrate).
-    if (newPeriod == state.periodSeconds && elapsedSinceStart > 0 && newTotal > 0) {
+    if (newPeriod == state.periodSeconds &&
+        elapsedSinceStart > 0 &&
+        newTotal > 0) {
       unawaited(_vibrate(1000));
     }
 
@@ -150,8 +154,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
     if (newTotal < 0) newTotal = 0;
 
     final elapsedSinceStart = _totalAtStart - newTotal;
-    final periodSecondsElapsed = elapsedSinceStart + (state.periodSeconds - _periodAtStart);
-    int newPeriod = state.periodSeconds - (periodSecondsElapsed % state.periodSeconds);
+    final periodSecondsElapsed =
+        elapsedSinceStart + (state.periodSeconds - _periodAtStart);
+    int newPeriod =
+        state.periodSeconds - (periodSecondsElapsed % state.periodSeconds);
     if (newPeriod <= 0) newPeriod = state.periodSeconds;
 
     if (newTotal == 0) {
