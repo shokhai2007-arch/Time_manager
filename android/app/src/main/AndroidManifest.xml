@@ -1,8 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.time_manager">
+
+    <!-- Vibratsiya (taymer davriy habar berish) -->
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- Internet (Auto-update: GitHub API orqali versiyani tekshirish) -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Yuklab olingan APK'ni o'rnatish uchun ruxsat -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
     <application
-        android:label="time_manager"
+        android:label="Time Management"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

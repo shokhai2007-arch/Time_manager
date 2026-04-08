@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_manager/main.dart';
+import 'package:time_management/main.dart';
 
 void main() {
   testWidgets('App loads and shows timer icon', (WidgetTester tester) async {

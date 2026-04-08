@@ -6,28 +6,37 @@ enum TimerStatus { idle, active, paused }
 
 class TimerState {
   final int totalSeconds;
-  final int remainingSeconds;
+  final int remainingTotalSeconds;
+  final int periodSeconds;
+  final int remainingPeriodSeconds;
   final TimerStatus status;
 
   TimerState({
     required this.totalSeconds,
-    required this.remainingSeconds,
+    required this.remainingTotalSeconds,
+    required this.periodSeconds,
+    required this.remainingPeriodSeconds,
     required this.status,
   });
 
   TimerState copyWith({
     int? totalSeconds,
-    int? remainingSeconds,
+    int? remainingTotalSeconds,
+    int? periodSeconds,
+    int? remainingPeriodSeconds,
     TimerStatus? status,
   }) {
     return TimerState(
       totalSeconds: totalSeconds ?? this.totalSeconds,
-      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+      remainingTotalSeconds: remainingTotalSeconds ?? this.remainingTotalSeconds,
+      periodSeconds: periodSeconds ?? this.periodSeconds,
+      remainingPeriodSeconds: remainingPeriodSeconds ?? this.remainingPeriodSeconds,
       status: status ?? this.status,
     );
   }
 
-  double get progress => totalSeconds > 0 ? remainingSeconds / totalSeconds : 0;
+  double get periodProgress => periodSeconds > 0 ? remainingPeriodSeconds / periodSeconds : 0;
+  double get totalProgress => totalSeconds > 0 ? remainingTotalSeconds / totalSeconds : 0;
 }
 
 class TimerNotifier extends StateNotifier<TimerState> {
@@ -35,17 +44,21 @@ class TimerNotifier extends StateNotifier<TimerState> {
       : super(
           TimerState(
             totalSeconds: 0,
-            remainingSeconds: 0,
+            remainingTotalSeconds: 0,
+            periodSeconds: 0,
+            remainingPeriodSeconds: 0,
             status: TimerStatus.idle,
           ),
         );
 
   Timer? _timer;
 
-  void setDuration(int seconds) {
+  void setDurations(int total, int period) {
     state = state.copyWith(
-      totalSeconds: seconds,
-      remainingSeconds: seconds,
+      totalSeconds: total,
+      remainingTotalSeconds: total,
+      periodSeconds: period,
+      remainingPeriodSeconds: period,
       status: TimerStatus.idle,
     );
   }
@@ -59,18 +72,33 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   void start() {
-    if (state.remainingSeconds <= 0) return;
+    if (state.remainingTotalSeconds <= 0) return;
 
     state = state.copyWith(status: TimerStatus.active);
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.remainingSeconds > 0) {
-        state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
+      if (state.remainingTotalSeconds > 0) {
+        final int newTotal = state.remainingTotalSeconds - 1;
+        int newPeriod = state.remainingPeriodSeconds - 1;
 
-        if (state.remainingSeconds == 0) {
+        if (newPeriod <= 0 && newTotal > 0) {
+          unawaited(_vibrate(3000));
+          newPeriod = state.periodSeconds;
+        }
+
+        if (newTotal == 0) {
           unawaited(_vibrate(2000));
           timer.cancel();
-          state = state.copyWith(status: TimerStatus.idle);
+          state = state.copyWith(
+            remainingTotalSeconds: 0,
+            remainingPeriodSeconds: 0,
+            status: TimerStatus.idle,
+          );
+        } else {
+          state = state.copyWith(
+            remainingTotalSeconds: newTotal,
+            remainingPeriodSeconds: newPeriod,
+          );
         }
       } else {
         timer.cancel();
@@ -86,7 +114,8 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void reset() {
     _timer?.cancel();
     state = state.copyWith(
-      remainingSeconds: state.totalSeconds,
+      remainingTotalSeconds: state.totalSeconds,
+      remainingPeriodSeconds: state.periodSeconds,
       status: TimerStatus.idle,
     );
     unawaited(_vibrate(500));
@@ -96,7 +125,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _timer?.cancel();
     state = TimerState(
       totalSeconds: 0,
-      remainingSeconds: 0,
+      remainingTotalSeconds: 0,
+      periodSeconds: 0,
+      remainingPeriodSeconds: 0,
       status: TimerStatus.idle,
     );
     unawaited(_vibrate(1000));

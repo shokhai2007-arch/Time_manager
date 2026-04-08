@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer_controller.dart';
 import 'decorators.dart';
 import 'widgets/haptic_ring.dart';
+import 'updater.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -36,9 +37,22 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  final TextEditingController _inputController = TextEditingController(
-    text: '60',
-  );
+  final TextEditingController _totalTimeController = TextEditingController(text: '60');
+  final TextEditingController _periodTimeController = TextEditingController(text: '10');
+
+  void _checkUpdates() async {
+    final hasUpdate = await AutoUpdater.checkForUpdates();
+    if (!mounted) return;
+    if (hasUpdate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Yangilanish topildi va yuklanmoqda...')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Oxirgi versiyadan foydalanyapsiz.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,32 +66,43 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 40),
-            // Header
-            Text(
-              'PITCH TIMER',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                color: Colors.blueGrey.withValues(alpha: 0.5),
-                letterSpacing: 5,
-              ),
+            const SizedBox(height: 20),
+            // Header (Tier 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 48), // Balance for icon button
+                Text(
+                  'TIME MANAGEMENT',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.blueGrey.withValues(alpha: 0.5),
+                    letterSpacing: 2,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.system_update_alt, color: Colors.blueGrey),
+                  onPressed: _checkUpdates,
+                  tooltip: 'Check for updates',
+                ),
+              ],
             ),
             const Spacer(),
 
-            // Central Ring/Timer
+            // Central Ring/Timer (Tier 2)
             GestureDetector(
               onTap: timerNotifier.toggle,
               onLongPress: timerNotifier.hardReset,
               child: HapticRingComponent(
-                progress: timerState.progress,
-                text: _formatTime(timerState.remainingSeconds),
+                progress: timerState.periodProgress,
+                text: _formatTime(timerState.remainingTotalSeconds),
               ),
             ),
 
             const Spacer(),
 
-            // Footer Inputs with Depth-Recess Transition
+            // Footer Inputs with Depth-Recess Transition (Tier 3)
             AnimatedOpacity(
               duration: const Duration(milliseconds: 500),
               opacity: isIdle ? 1.0 : 0.0,
@@ -91,37 +116,62 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   ),
                   child: Column(
                     children: [
-                      Neumorphic(
-                        style: NeumorphicDecorator.recessedStyle,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 5,
-                        ),
-                        child: TextField(
-                          controller: _inputController,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Neumorphic(
+                              style: NeumorphicDecorator.recessedStyle,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              child: TextField(
+                                controller: _totalTimeController,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Total (s)',
+                                ),
+                              ),
+                            ),
                           ),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter Seconds',
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Neumorphic(
+                              style: NeumorphicDecorator.recessedStyle,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              child: TextField(
+                                controller: _periodTimeController,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Period (s)',
+                                ),
+                              ),
+                            ),
                           ),
-                          onChanged: (val) {
-                            final sec = int.tryParse(val) ?? 0;
-                            timerNotifier.setDuration(sec);
-                          },
-                        ),
+                        ],
                       ),
                       const SizedBox(height: 30),
                       NeumorphicButton(
                         onPressed: () {
                           if (isIdle) {
-                            final sec =
-                                int.tryParse(_inputController.text) ?? 60;
-                            timerNotifier.setDuration(sec);
+                            final total = int.tryParse(_totalTimeController.text) ?? 60;
+                            final period = int.tryParse(_periodTimeController.text) ?? 10;
+                            timerNotifier.setDurations(total, period);
                             timerNotifier.start();
                           } else {
                             timerNotifier.toggle();
@@ -162,3 +212,4 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 }
+
