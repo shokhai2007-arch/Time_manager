@@ -8,6 +8,6 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
 
     // Verify that the title text exists.
-    expect(find.text('PITCH TIMER'), findsOneWidget);
+    expect(find.text('TIME MANAGEMENT'), findsOneWidget);
   });
 }
