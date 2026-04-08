@@ -37,8 +37,10 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  final TextEditingController _totalTimeController = TextEditingController(text: '60');
-  final TextEditingController _periodTimeController = TextEditingController(text: '10');
+  final TextEditingController _totalTimeController =
+      TextEditingController(text: '60');
+  final TextEditingController _periodTimeController =
+      TextEditingController(text: '10');
 
   void _checkUpdates() async {
     final hasUpdate = await AutoUpdater.checkForUpdates();
@@ -82,7 +84,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.system_update_alt, color: Colors.blueGrey),
+                  icon: const Icon(Icons.system_update_alt,
+                      color: Colors.blueGrey),
                   onPressed: _checkUpdates,
                   tooltip: 'Check for updates',
                 ),
@@ -169,8 +172,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       NeumorphicButton(
                         onPressed: () {
                           if (isIdle) {
-                            final total = int.tryParse(_totalTimeController.text) ?? 60;
-                            final period = int.tryParse(_periodTimeController.text) ?? 10;
+                            final total =
+                                int.tryParse(_totalTimeController.text) ?? 60;
+                            final period =
+                                int.tryParse(_periodTimeController.text) ?? 10;
                             timerNotifier.setDurations(total, period);
                             timerNotifier.start();
                           } else {
@@ -212,4 +217,3 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return '${mins.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 }
-

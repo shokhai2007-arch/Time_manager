@@ -28,15 +28,19 @@ class TimerState {
   }) {
     return TimerState(
       totalSeconds: totalSeconds ?? this.totalSeconds,
-      remainingTotalSeconds: remainingTotalSeconds ?? this.remainingTotalSeconds,
+      remainingTotalSeconds:
+          remainingTotalSeconds ?? this.remainingTotalSeconds,
       periodSeconds: periodSeconds ?? this.periodSeconds,
-      remainingPeriodSeconds: remainingPeriodSeconds ?? this.remainingPeriodSeconds,
+      remainingPeriodSeconds:
+          remainingPeriodSeconds ?? this.remainingPeriodSeconds,
       status: status ?? this.status,
     );
   }
 
-  double get periodProgress => periodSeconds > 0 ? remainingPeriodSeconds / periodSeconds : 0;
-  double get totalProgress => totalSeconds > 0 ? remainingTotalSeconds / totalSeconds : 0;
+  double get periodProgress =>
+      periodSeconds > 0 ? remainingPeriodSeconds / periodSeconds : 0;
+  double get totalProgress =>
+      totalSeconds > 0 ? remainingTotalSeconds / totalSeconds : 0;
 }
 
 class TimerNotifier extends StateNotifier<TimerState> {

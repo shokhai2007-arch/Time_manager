@@ -4,7 +4,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AutoUpdater {
-  static const String _repoUrl = 'https://api.github.com/repos/shokhai2007-arch/Time_manager/releases/latest';
+  static const String _repoUrl =
+      'https://api.github.com/repos/shokhai2007-arch/Time_manager/releases/latest';
 
   static Future<bool> checkForUpdates() async {
     try {
@@ -15,19 +16,21 @@ class AutoUpdater {
         final apkUrl = _getApkUrl(data['assets']);
 
         final packageInfo = await PackageInfo.fromPlatform();
-        final currentVersion = packageInfo.version; // Typically something like 1.0.0
+        final currentVersion =
+            packageInfo.version; // Typically something like 1.0.0
 
         // In a real app we'd parse semver properly. For simplicity, we just check if it contains the version
         // or just consider any mismatch / specific naming convention.
         // As a simple example:
         if (latestVersionTag != 'v$currentVersion' && apkUrl != null) {
           // Trigger URL launcher to download/install
-          await launchUrl(Uri.parse(apkUrl), mode: LaunchMode.externalApplication);
+          await launchUrl(Uri.parse(apkUrl),
+              mode: LaunchMode.externalApplication);
           return true;
         }
       }
     } catch (e) {
-      // Handle error implicitly 
+      // Handle error implicitly
     }
     return false;
   }
