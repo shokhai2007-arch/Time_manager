@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -33,4 +35,30 @@ jobs:
         run: flutter test --verbose
 
       - name: Build APK
-        run: flutter build apk --debug --verbose
+        run: flutter build apk --debug
+
+      - name: Generate Release Notes
+        run: |
+          cat << 'EOF' > release_notes.md
+          ## Neumorphic Pitch Timer ⏱️
+          
+          Ushbu versiya avtomatik ravishda GitHub Actions orqali yaratildi.
+          
+          **O'zgarishlar:**
+          - 🎨 Neumorphic dizayn interfeysi.
+          - ⏳ Tezkor Timer boshqaruvi.
+          - 📳 Haptic (Vibratsiya) feedback qo'shildi.
+          
+          Ilovani (APK) yuklab olish uchun quyidagi aktivlardan foydalaning.
+          EOF
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.run_number }}"
+          name: "Neumorphic Pitch Timer (Build ${{ github.run_number }})"
+          body_path: release_notes.md
+          files: build/app/outputs/flutter-apk/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
