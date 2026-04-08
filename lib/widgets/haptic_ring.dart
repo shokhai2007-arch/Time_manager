@@ -19,7 +19,7 @@ class HapticRingComponent extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.blueAccent.withOpacity(0.3),
+            color: Colors.blueAccent.withValues(alpha: 0.3),
             blurRadius: 40,
             spreadRadius: 5,
           ),

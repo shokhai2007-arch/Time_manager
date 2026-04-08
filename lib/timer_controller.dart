@@ -32,11 +32,13 @@ class TimerState {
 
 class TimerNotifier extends StateNotifier<TimerState> {
   TimerNotifier()
-      : super(TimerState(
+    : super(
+        TimerState(
           totalSeconds: 0,
           remainingSeconds: 0,
           status: TimerStatus.idle,
-        ));
+        ),
+      );
 
   Timer? _timer;
 
@@ -64,7 +66,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (state.remainingSeconds > 0) {
         state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
-        
+
         if (state.remainingSeconds == 0) {
           unawaited(_vibrate(2000));
           timer.cancel();
@@ -102,7 +104,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   Future<void> _vibrate(int duration) async {
     if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate(duration: duration);
+      unawaited(Vibration.vibrate(duration: duration));
     }
   }
 

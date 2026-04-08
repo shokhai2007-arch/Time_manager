@@ -5,11 +5,7 @@ import 'decorators.dart';
 import 'widgets/haptic_ring.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -40,7 +36,9 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  final TextEditingController _inputController = TextEditingController(text: '60');
+  final TextEditingController _inputController = TextEditingController(
+    text: '60',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +59,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
-                color: Colors.blueGrey.withOpacity(0.5),
+                color: Colors.blueGrey.withValues(alpha: 0.5),
                 letterSpacing: 5,
               ),
             ),
@@ -87,17 +85,26 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 duration: const Duration(milliseconds: 500),
                 scale: isIdle ? 1.0 : 0.8,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 20,
+                  ),
                   child: Column(
                     children: [
                       Neumorphic(
                         style: NeumorphicDecorator.recessedStyle,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 5,
+                        ),
                         child: TextField(
                           controller: _inputController,
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Enter Seconds',
@@ -112,7 +119,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       NeumorphicButton(
                         onPressed: () {
                           if (isIdle) {
-                            final sec = int.tryParse(_inputController.text) ?? 60;
+                            final sec =
+                                int.tryParse(_inputController.text) ?? 60;
                             timerNotifier.setDuration(sec);
                             timerNotifier.start();
                           } else {
@@ -120,10 +128,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           }
                         },
                         style: NeumorphicDecorator.standardStyle,
-                        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 60,
+                          vertical: 15,
+                        ),
                         child: Text(
-                          isIdle ? 'START' : (timerState.status == TimerStatus.active ? 'PAUSE' : 'RESUME'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          isIdle
+                              ? 'START'
+                              : (timerState.status == TimerStatus.active
+                                    ? 'PAUSE'
+                                    : 'RESUME'),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     ],
