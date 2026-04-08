@@ -36,11 +36,32 @@ class MainScreen extends ConsumerStatefulWidget {
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen>
+    with WidgetsBindingObserver {
   final TextEditingController _totalTimeController =
       TextEditingController(text: '60');
   final TextEditingController _periodTimeController =
       TextEditingController(text: '10');
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Ilova fon rejimidan qaytganda taymer vaqtini qayta hisoblash
+      ref.read(timerProvider.notifier).recalculateAfterResume();
+    }
+  }
 
   void _checkUpdates() async {
     final hasUpdate = await AutoUpdater.checkForUpdates();

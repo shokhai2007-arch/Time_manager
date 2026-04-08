@@ -39,18 +39,15 @@ jobs:
 
       - name: Generate Release Notes
         run: |
-          cat << 'EOF' > release_notes.md
-          ## Neumorphic Pitch Timer ⏱️
-          
-          Ushbu versiya avtomatik ravishda GitHub Actions orqali yaratildi.
-          
-          **O'zgarishlar:**
-          - 🎨 Neumorphic dizayn interfeysi.
-          - ⏳ Tezkor Timer boshqaruvi.
-          - 📳 Haptic (Vibratsiya) feedback qo'shildi.
-          
-          Ilovani (APK) yuklab olish uchun quyidagi aktivlardan foydalaning.
-          EOF
+          echo "## Neumorphic Pitch Timer ⏱️" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Ushbu versiya avtomatik ravishda GitHub Actions orqali yaratildi." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "**So'nggi o'zgarishlar:**" >> release_notes.md
+          git log -1 --pretty=format:"- %s (%h)" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "Ilovani (APK) yuklab olish uchun quyidagi aktivlardan foydalaning." >> release_notes.md
 
       - name: Create Release
         if: github.ref == 'refs/heads/main'
