@@ -32,13 +32,13 @@ class TimerState {
 
 class TimerNotifier extends StateNotifier<TimerState> {
   TimerNotifier()
-    : super(
-        TimerState(
-          totalSeconds: 0,
-          remainingSeconds: 0,
-          status: TimerStatus.idle,
-        ),
-      );
+      : super(
+          TimerState(
+            totalSeconds: 0,
+            remainingSeconds: 0,
+            status: TimerStatus.idle,
+          ),
+        );
 
   Timer? _timer;
 

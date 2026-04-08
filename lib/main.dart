@@ -136,8 +136,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           isIdle
                               ? 'START'
                               : (timerState.status == TimerStatus.active
-                                    ? 'PAUSE'
-                                    : 'RESUME'),
+                                  ? 'PAUSE'
+                                  : 'RESUME'),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
