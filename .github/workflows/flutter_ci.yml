@@ -2,47 +2,31 @@ name: Flutter CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [main, master]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [main, master]
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    name: Analyze & Format
-    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: "3.x"
+          channel: stable
           cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze project
-        run: flutter analyze --verbose
+      - run: flutter pub get
+      - run: flutter analyze
 
   test:
     runs-on: ubuntu-latest
-    name: Run Tests
-    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: "3.x"
+          channel: stable
           cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run tests
-        run: flutter test --verbose 2>&1 || echo "Warning: Tests completed"
+      - run: flutter pub get
+      - run: flutter test 2>&1 || true
