@@ -1,11 +1,15 @@
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'timer_controller.dart';
 import 'decorators.dart';
 import 'widgets/haptic_ring.dart';
 import 'updater.dart';
+import 'background_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeBackgroundService();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -42,11 +46,13 @@ class _MainScreenState extends ConsumerState<MainScreen>
       TextEditingController(text: '60');
   final TextEditingController _periodTimeController =
       TextEditingController(text: '10');
+  late final Future<PackageInfo> _packageInfoFuture;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _packageInfoFuture = PackageInfo.fromPlatform();
   }
 
   @override
@@ -197,6 +203,16 @@ class _MainScreenState extends ConsumerState<MainScreen>
                                 int.tryParse(_totalTimeController.text) ?? 60;
                             final period =
                                 int.tryParse(_periodTimeController.text) ?? 10;
+                            if (total <= 0 || period <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Iltimos, 0 dan katta son kiriting.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
                             timerNotifier.setDurations(total, period);
                             timerNotifier.start();
                           } else {
@@ -219,6 +235,24 @@ class _MainScreenState extends ConsumerState<MainScreen>
                             fontSize: 18,
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 20),
+                      FutureBuilder<PackageInfo>(
+                        future: _packageInfoFuture,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const SizedBox.shrink();
+                          }
+                          final version = snapshot.data!.version;
+                          final buildNumber = snapshot.data!.buildNumber;
+                          return Text(
+                            'Versiya $version+$buildNumber',
+                            style: TextStyle(
+                              color: Colors.blueGrey.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

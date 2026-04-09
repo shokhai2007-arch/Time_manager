@@ -2,7 +2,7 @@ name: time_management
 description: "A time management application with Neumorphic design."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -15,15 +15,18 @@ dependencies:
   flutter_neumorphic_plus: ^3.2.0
   vibration: ^3.1.8
   percent_indicator: ^4.2.3
-  flutter_riverpod: ^2.5.1
+  flutter_riverpod: ^3.3.1
   package_info_plus: ^9.0.1
+  shared_preferences: ^2.2.0
+  flutter_background_service: ^5.1.0
+  flutter_background_service_android: ^6.3.1
   http: ^1.6.0
   url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
 flutter:
