@@ -1,10 +1,8 @@
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'timer_controller.dart';
 import 'decorators.dart';
 import 'widgets/haptic_ring.dart';
-import 'updater.dart';
 import 'background_service.dart';
 
 Future<void> main() async {
@@ -46,13 +44,11 @@ class _MainScreenState extends ConsumerState<MainScreen>
       TextEditingController(text: '60');
   final TextEditingController _periodTimeController =
       TextEditingController(text: '10');
-  late final Future<PackageInfo> _packageInfoFuture;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _packageInfoFuture = PackageInfo.fromPlatform();
   }
 
   @override
@@ -66,20 +62,6 @@ class _MainScreenState extends ConsumerState<MainScreen>
     if (state == AppLifecycleState.resumed) {
       // Ilova fon rejimidan qaytganda taymer vaqtini qayta hisoblash
       ref.read(timerProvider.notifier).recalculateAfterResume();
-    }
-  }
-
-  void _checkUpdates() async {
-    final hasUpdate = await AutoUpdater.checkForUpdates();
-    if (!mounted) return;
-    if (hasUpdate) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Yangilanish topildi va yuklanmoqda...')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Oxirgi versiyadan foydalanyapsiz.')),
-      );
     }
   }
 
@@ -98,9 +80,8 @@ class _MainScreenState extends ConsumerState<MainScreen>
             const SizedBox(height: 20),
             // Header (Tier 1)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(width: 48), // Balance for icon button
                 Text(
                   'TIME MANAGEMENT',
                   style: TextStyle(
@@ -109,12 +90,6 @@ class _MainScreenState extends ConsumerState<MainScreen>
                     color: Colors.blueGrey.withValues(alpha: 0.5),
                     letterSpacing: 2,
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.system_update_alt,
-                      color: Colors.blueGrey),
-                  onPressed: _checkUpdates,
-                  tooltip: 'Check for updates',
                 ),
               ],
             ),
@@ -235,24 +210,6 @@ class _MainScreenState extends ConsumerState<MainScreen>
                             fontSize: 18,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      FutureBuilder<PackageInfo>(
-                        future: _packageInfoFuture,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const SizedBox.shrink();
-                          }
-                          final version = snapshot.data!.version;
-                          final buildNumber = snapshot.data!.buildNumber;
-                          return Text(
-                            'Versiya $version+$buildNumber',
-                            style: TextStyle(
-                              color: Colors.blueGrey.withValues(alpha: 0.5),
-                              fontSize: 12,
-                            ),
-                          );
-                        },
                       ),
                     ],
                   ),

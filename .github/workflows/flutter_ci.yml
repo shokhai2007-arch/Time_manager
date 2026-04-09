@@ -117,10 +117,8 @@ jobs:
       - name: Get version from pubspec.yaml
         id: version
         run: |
-          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
-          BUILD=$(grep 'version:' pubspec.yaml | awk -F'+' '{print $2}')
+          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "build=${BUILD}" >> $GITHUB_OUTPUT
 
       - name: List Build Output
         run: |
@@ -134,7 +132,7 @@ jobs:
           {
             echo "## Neumorphic Pitch Timer ⏱️"
             echo ""
-            echo "**Versiya:** ${{ steps.version.outputs.version }} (Build ${{ steps.version.outputs.build }})"
+            echo "**Versiya:** ${{ steps.version.outputs.version }}"
             echo ""
             echo "### ℹ️ Izoh"
             echo "Ushbu versiya avtomatik ravishda GitHub Actions orqali yaratildi."
@@ -154,8 +152,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v${{ steps.version.outputs.version }}-build${{ steps.version.outputs.build }}"
-          name: "Time Manager v${{ steps.version.outputs.version }} (Build ${{ steps.version.outputs.build }})"
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "Time Manager v${{ steps.version.outputs.version }}"
           body_path: release_notes.md
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
@@ -166,6 +164,6 @@ jobs:
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: time-manager-apk-${{ steps.version.outputs.version }}
+          name: time-manager-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
