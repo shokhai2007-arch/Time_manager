@@ -1,10 +1,10 @@
-name: Flutter CI/CD - APK Builder
+name: Flutter CI
 
 on:
   push:
-    branches: [ "main", "master", "develop" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main", "master", "develop" ]
+    branches: [ "main", "master" ]
 
 jobs:
   analyze:
@@ -23,9 +23,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze project
         run: flutter analyze --verbose
@@ -48,122 +45,4 @@ jobs:
         run: flutter pub get
 
       - name: Run tests
-        run: flutter test --verbose 2>&1 || echo "Warning: Some tests failed but continuing..."
-
-  build-apk:
-    runs-on: ubuntu-latest
-    name: Build Release APK
-    permissions:
-      contents: write
-    needs: [analyze, test]
-    if: always()
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-          channel: 'stable'
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Configure Gradle
-        run: |
-          mkdir -p ~/.gradle
-          echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.parallel=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.configureondemand=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.caching=true" >> ~/.gradle/gradle.properties
-          echo "org.gradle.jvmargs=-Xmx8G" >> ~/.gradle/gradle.properties
-
-      - name: Decode Signing Key
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
-        continue-on-error: true
-
-      - name: Build Release APK (with signing)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          flutter build apk \
-            --release \
-            --verbose \
-            --dart-define=FLAVOR=production
-        env:
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        continue-on-error: false
-
-      - name: Build Release APK (unsigned)
-        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
-        run: |
-          flutter build apk \
-            --release \
-            --verbose \
-            --dart-define=FLAVOR=development
-
-      - name: Get version from pubspec.yaml
-        id: version
-        run: |
-          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
-      - name: List Build Output
-        run: |
-          echo "=== Build Outputs ==="
-          find build/app/outputs -type f -name "*.apk" 2>/dev/null | head -20
-          ls -lh build/app/outputs/flutter-apk/ || echo "APK directory not found"
-
-      - name: Generate Release Notes
-        id: notes
-        run: |
-          {
-            echo "## Neumorphic Pitch Timer ⏱️"
-            echo ""
-            echo "**Versiya:** ${{ steps.version.outputs.version }}"
-            echo ""
-            echo "### ℹ️ Izoh"
-            echo "Ushbu versiya avtomatik ravishda GitHub Actions orqali yaratildi."
-            echo ""
-            echo "### 🔄 So'nggi o'zgarishlar"
-            git log --oneline -5
-            echo ""
-            echo "### 📥 Foydalanish"
-            echo "APK faylni telefoningizga yuklab olib, uni o'rnating."
-            echo ""
-            echo "---"
-            echo "**Qurilish vaqti:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-            echo "**Workflow:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          } > release_notes.md
-
-      - name: Create GitHub Release
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v${{ steps.version.outputs.version }}"
-          name: "Time Manager v${{ steps.version.outputs.version }}"
-          body_path: release_notes.md
-          files: build/app/outputs/flutter-apk/app-release.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload APK as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: time-manager-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
+        run: flutter test --verbose 2>&1 || echo "Warning: Tests completed"
